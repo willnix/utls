@@ -19,11 +19,12 @@ import (
 // uTLS will call .handshake() on one of these private internal states,
 // to perform TLS handshake using standard crypto/tls implementation.
 type ClientHandshakeState struct {
-	C            *Conn
-	ServerHello  *ServerHelloMsg
-	Hello        *ClientHelloMsg
-	MasterSecret []byte
-	Session      *ClientSessionState
+	C                 *Conn
+	ServerHello       *ServerHelloMsg
+	ServerKeyExchange *ServerKeyExchangeMsg
+	Hello             *ClientHelloMsg
+	MasterSecret      []byte
+	Session           *ClientSessionState
 
 	State12 TLS12OnlyState
 	State13 TLS13OnlyState
@@ -137,9 +138,10 @@ func (chs12 *clientHandshakeState) toPublic12() *ClientHandshakeState {
 			FinishedHash: chs12.finishedHash.getPublicObj(),
 		}
 		return &ClientHandshakeState{
-			C:           chs12.c,
-			ServerHello: chs12.serverHello.getPublicPtr(),
-			Hello:       chs12.hello.getPublicPtr(),
+			C:                 chs12.c,
+			ServerHello:       chs12.serverHello.getPublicPtr(),
+			ServerKeyExchange: chs12.serverKeyExchange.getPublicPtr(),
+			Hello:             chs12.hello.getPublicPtr(),
 
 			Session: chs12.session,
 
@@ -311,6 +313,33 @@ func (shm *serverHelloMsg) getPublicPtr() *ServerHelloMsg {
 			SelectedIdentity:             shm.selectedIdentity,
 			Cookie:                       shm.cookie,
 			SelectedGroup:                shm.selectedGroup,
+		}
+	}
+}
+
+type ServerKeyExchangeMsg struct {
+	Raw []byte
+	Key []byte
+}
+
+func (skx *ServerKeyExchangeMsg) getPrivatePtr() *serverKeyExchangeMsg {
+	if skx == nil {
+		return nil
+	} else {
+		return &serverKeyExchangeMsg{
+			raw: skx.Raw,
+			key: skx.Key,
+		}
+	}
+}
+
+func (skx *serverKeyExchangeMsg) getPublicPtr() *ServerKeyExchangeMsg {
+	if skx == nil {
+		return nil
+	} else {
+		return &ServerKeyExchangeMsg{
+			Raw: skx.raw,
+			Key: skx.key,
 		}
 	}
 }

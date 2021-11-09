@@ -22,13 +22,14 @@ import (
 )
 
 type clientHandshakeState struct {
-	c            *Conn
-	serverHello  *serverHelloMsg
-	hello        *clientHelloMsg
-	suite        *cipherSuite
-	finishedHash finishedHash
-	masterSecret []byte
-	session      *ClientSessionState
+	c                 *Conn
+	serverHello       *serverHelloMsg
+	serverKeyExchange *serverKeyExchangeMsg
+	hello             *clientHelloMsg
+	suite             *cipherSuite
+	finishedHash      finishedHash
+	masterSecret      []byte
+	session           *ClientSessionState
 
 	uconn *UConn // [UTLS]
 }
@@ -500,6 +501,11 @@ func (hs *clientHandshakeState) doFullHandshake() error {
 
 	skx, ok := msg.(*serverKeyExchangeMsg)
 	if ok {
+		// fsteinmetz: add skx to the handshake state to make it accessible for other packages.
+		// Actually accessing it still requires ugly reflection hacks but thats also true for
+		// serverHello and I would like to keep the changes to this package mininal for now.
+		hs.serverKeyExchange = skx
+
 		hs.finishedHash.Write(skx.marshal())
 		err = keyAgreement.processServerKeyExchange(c.config, hs.hello, hs.serverHello, c.peerCertificates[0], skx)
 		if err != nil {
