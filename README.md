@@ -9,6 +9,10 @@ If you have any questions, bug reports or contributions, you are welcome to publ
 Documentation below may not keep up with all the changes and new features at all times,
 so you are encouraged to use [godoc](https://godoc.org/github.com/refraction-networking/utls#UConn).
 
+# This Fork
+This is my (@willnix) fork of uTLS to make Server DH keyshares somewhat accessible.
+It's not yet done and still requires some ugly reflection hacks to get the actual keyshare values.
+
 # Features
 ## Low-level access to handshake
 * Read/write access to all bits of client hello message.  
