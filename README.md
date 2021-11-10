@@ -11,7 +11,7 @@ so you are encouraged to use [godoc](https://godoc.org/github.com/refraction-net
 
 # This Fork
 This is my (@willnix) fork of uTLS to make Server DH keyshares somewhat accessible.
-It's not yet done and still requires some ugly reflection hacks to get the actual keyshare values.
+Both ServerKeyexchangeMsg for TLS <= 1.2 and ServerHelloMsg.ServerShare for TLS 1.3 are made public.
 
 # Features
 ## Low-level access to handshake
