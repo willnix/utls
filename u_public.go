@@ -249,7 +249,7 @@ type ServerHelloMsg struct {
 
 	// 1.3
 	SupportedVersion        uint16
-	ServerShare             keyShare
+	ServerShare             KeyShare
 	SelectedIdentityPresent bool
 	SelectedIdentity        uint16
 	Cookie                  []byte  // HelloRetryRequest extension
@@ -278,7 +278,7 @@ func (shm *ServerHelloMsg) getPrivatePtr() *serverHelloMsg {
 			secureRenegotiationSupported: shm.SecureRenegotiationSupported,
 			alpnProtocol:                 shm.AlpnProtocol,
 			supportedVersion:             shm.SupportedVersion,
-			serverShare:                  shm.ServerShare,
+			serverShare:                  KeyShare(shm.ServerShare).ToPrivate(),
 			selectedIdentityPresent:      shm.SelectedIdentityPresent,
 			selectedIdentity:             shm.SelectedIdentity,
 			cookie:                       shm.Cookie,
@@ -308,7 +308,7 @@ func (shm *serverHelloMsg) getPublicPtr() *ServerHelloMsg {
 			SecureRenegotiationSupported: shm.secureRenegotiationSupported,
 			AlpnProtocol:                 shm.alpnProtocol,
 			SupportedVersion:             shm.supportedVersion,
-			ServerShare:                  shm.serverShare,
+			ServerShare:                  keyShare(shm.serverShare).ToPublic(),
 			SelectedIdentityPresent:      shm.selectedIdentityPresent,
 			SelectedIdentity:             shm.selectedIdentity,
 			Cookie:                       shm.cookie,
@@ -564,6 +564,19 @@ func (fh *finishedHash) getPublicObj() FinishedHash {
 type KeyShare struct {
 	Group CurveID
 	Data  []byte
+}
+
+func (ks keyShare) ToPublic() KeyShare {
+	var KS KeyShare
+	KS = KeyShare{Data: ks.data, Group: ks.group}
+
+	return KS
+}
+func (KS KeyShare) ToPrivate() keyShare {
+	var ks keyShare
+	ks = keyShare{data: KS.Data, group: KS.Group}
+
+	return ks
 }
 
 type KeyShares []KeyShare
